@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>EHS Chatbot Test</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+      }
+      textarea {
+        display: block;
+        width: 100%;
+        margin-bottom: 10px;
+      }
+      button {
+        margin-bottom: 20px;
+      }
+      #response {
+        white-space: pre-wrap; 
+        border: 1px solid #ccc;
+        padding: 10px;
+        min-height: 50px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>EHS Chatbot Test</h1>
+    <p>Type your question below and click "Ask" to send it to the n8n webhook.</p>
+
+    <textarea id="question" rows="3" placeholder="Ask a question..."></textarea>
+    <button onclick="askChatbot()">Ask</button>
+
+    <div id="response"></div>
+
+    <script>
+      async function askChatbot() {
+        const question = document.getElementById("question").value;
+        const responseDiv = document.getElementById("response");
+        responseDiv.innerText = "Waiting for response...";
+
+        try {
+          // Replace this URL with your n8n production webhook if it's different
+          const webhookUrl = "https://steven-hes.app.n8n.cloud/webhook/580c9b4f-2fc6-434d-9865-712d7e7296be/chat";
+
+          const res = await fetch(webhookUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ question })
+          });
+
+          if (!res.ok) {
+            throw new Error("Network response was not ok. Status: " + res.status);
+          }
+
+          const data = await res.json();
+          // Adjust how you display the response based on your webhook's return structure
+          responseDiv.innerText = data.answer || JSON.stringify(data);
+        } catch (error) {
+          responseDiv.innerText = "Error: " + error.message;
+        }
+      }
+    </script>
+  </body>
+</html>
